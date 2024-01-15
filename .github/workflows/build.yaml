@@ -11,13 +11,13 @@ permissions:
   id-token: "write"
   packages: "write"
 
-env:
-  TEST_CODEBUNDLE_PATH: /app/codecollection/codebundles/hello_world/sli.robot
-  CURL_URL: http://localhost:3000/hello_world/sli-log.html
+
 
 jobs:
   build-and-push-ghcr:
     runs-on: ubuntu-latest
+    env:
+      codebundle: hello_world
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,8 +30,8 @@ jobs:
       - name: Smoke Test Build
         run: |
           docker run -d -p 3000:3000 --name mycodecollection ghcr.io/${{ github.repository }}:latest 
-          docker exec mycodecollection bash -c "ro ${{ env.TEST_CODEBUNDLE_PATH }} && ls -R /robot_logs"
-          curl --fail-with-body ${{ env.CURL_URL }}
+          docker exec mycodecollection bash -c "ro /app/codecollection/codebundles/${{ env.codebundle }}/sli.robot && ls -R /robot_logs"
+          curl --fail-with-body http://localhost:3000/${{ env.codebundle }}/sli-log.html
       - name: Push
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin ghcr.io
