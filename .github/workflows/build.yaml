@@ -21,7 +21,7 @@ jobs:
   build-and-push-ghcr:
     runs-on: ubuntu-latest
     env:
-      codebundle: hello_world
+      codebundle: rds-mysql-conn-count
     steps:
       - name: Checkout
         uses: actions/checkout@v2
