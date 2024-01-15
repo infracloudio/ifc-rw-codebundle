@@ -1,0 +1,26 @@
+location: location-01-us-west1
+codeBundle:
+  repoUrl: https://github.com/infracloudio/infracloud-runwhen-codecollection.git
+  ref: codebundle-rds-mysql-conn
+  pathToRobot: codebundles/rds-mysql-conn-count/runbook.robot
+configProvided:
+  - name: KUBERNETES_DISTRIBUTION_BINARY
+    value: kubectl
+  - name: NAMESPACE
+    value: default
+  - name: ERROR_PATTERN
+    value: (Error|Exception)
+  - name: CONTEXT
+    value: default
+  - name: SERVICE_ERROR_PATTERN
+    value: (Error:)
+  - name: SERVICE_EXCLUDE_PATTERN
+    value: (node_modules|opentelemetry)
+  - name: ANOMALY_THRESHOLD
+    value: '5.0'
+secretsProvided:
+  - name: kubeconfig
+    workspaceKey: kubeconfig
+servicesProvided:
+  - name: kubectl
+    locationServiceName: kubectl-service.shared
