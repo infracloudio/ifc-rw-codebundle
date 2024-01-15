@@ -1,0 +1,34 @@
+displayUnitsLong: OK
+displayUnitsShort: ok
+locations:
+  - location-01-us-west1
+description: >-
+  Watch RDS MySql connection count
+codeBundle:
+  repoUrl: https://github.com/infracloudio/infracloud-runwhen-codecollection.git
+  ref: codebundle-rds-mysql-conn
+  pathToRobot: codebundles/rds-mysql-conn-count/sli.robot
+# read more about intervalStrategy here: https://docs.runwhen.com/public/runwhen-platform/feature-overview/points-on-the-map-slxs/service-level-indicators-slis/interval-strategies
+intervalStrategy: intermezzo
+intervalSeconds: 30
+configProvided:
+  - name: PROMETHEUS_HOSTNAME
+    value: >-
+      http://aeccfb7ff9bfb4705b6218294a7346c3-2081802229.us-west-2.elb.amazonaws.com/prometheus/api/v1
+  - name: QUERY
+    value: >-
+      aws_rds_database_connections_average{dimension_DBInstanceIdentifier="robotshopmysql"} > 1
+  - name: TRANSFORM
+    value: RAW
+  - name: STEP
+    value: '30'
+  - name: DATA_COLUMN
+    value: '1'
+  - name: NO_RESULT_OVERWRITE
+    value: 'Yes'
+  - name: NO_RESULT_VALUE
+    value: '0'
+secretsProvided: []
+servicesProvided:
+  - name: curl
+    locationServiceName: curl-service.shared
