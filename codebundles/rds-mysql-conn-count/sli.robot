@@ -6,6 +6,10 @@ Suite Setup       Suite Initialization
 Library           RW.Core
 Library           RW.Prometheus
 
+*** Variables ***
+${ENV_PROMETHEUS_HOST}      %{ENV_PROMETHEUS_HOST}
+${ENV_QUERY}      %{ENV_QUERY}
+
 *** Keywords ***
 Suite Initialization
     ${CURL_SERVICE}=    RW.Core.Import Service    curl
@@ -18,7 +22,7 @@ Suite Initialization
     ...    type=string
     ...    description=A json string of headers to include in the request against the Prometheus instance. This can include your token.
     ...    pattern=\w*
-    ...    default="{}"
+    ...    default="{"my-header":"my-value"}"
     ...    example='{"my-header":"my-value", "Authorization": "Bearer mytoken"}'
     RW.Core.Import User Variable    PROMETHEUS_HOSTNAME
     ...    type=string
@@ -68,9 +72,10 @@ Suite Initialization
 
 *** Tasks ***
 Querying Prometheus Instance And Pushing Aggregated Data
+    Log      ${ENV_QUERY}
     ${rsp}=    RW.Prometheus.Query Instant
-    ...    api_url=${PROMETHEUS_HOSTNAME}
-    ...    query=${QUERY}
+    ...    api_url=${ENV_PROMETHEUS_HOST}
+    ...    query=${ENV_QUERY}
     ...    step=${STEP}
     ...    target_service=${CURL_SERVICE}
     ${data}=    Set Variable    ${rsp["data"]}
