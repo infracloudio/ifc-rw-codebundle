@@ -10,18 +10,15 @@ Library             RW.CLI
 Suite Setup         Suite Initialization
 
 *** Variables ***
-${MYSQL_USER_ENV}      %{MYSQL_USER_ENV}
 ${MYSQL_PASSWORD_ENV}      %{MYSQL_PASSWORD_ENV}
-${MYSQL_HOST_ENV}      %{MYSQL_HOST_ENV}
-${PROCESS_USER_ENV}      %{PROCESS_USER_ENV}
 
 *** Tasks ***
 Run Bash File
-    [Documentation]    Runs a bash file to verify script passthrough works
+    [Documentation]    Runs a bash file to kill sleep processes created in MySQL
     [Tags]    file    script
     ${rsp}=    RW.CLI.Run Bash File
     ...    bash_file=kill-mysql-sleep-processes.sh
-    ...    cmd_overide=./kill-mysql-sleep-processes.sh livenessProbe
+    ...    cmd_override=./kill-mysql-sleep-processes.sh
     ...    env=${env}
     ...    include_in_history=False
     RW.Core.Add Pre To Report    Command Stdout:\n${rsp.stdout}
@@ -34,7 +31,6 @@ Suite Initialization
     ...    type=string
     ...    description=MySQL password
     ...    pattern=\w*
-    ...    default="dwfsfeefe"
     ...    example='9jZGIzNDIxego'
     ${MYSQL_USER}=    RW.Core.Import User Variable    MYSQL_USER
     ...    type=string
@@ -53,4 +49,4 @@ Suite Initialization
     ...    example=shipping
 
     Set Suite Variable
-    ...    ${env}    {"MYSQL_USER_ENV":"${MYSQL_USER_ENV}", "MYSQL_PASSWORD_ENV":"${MYSQL_PASSWORD_ENV}"}
+    ...    ${env}    {"MYSQL_USER":"${MYSQL_USER}", "MYSQL_PASSWORD":"${MYSQL_PASSWORD_ENV}", "MYSQL_HOST":"${MYSQL_HOST}", "PROCESS_USER":"${PROCESS_USER}"}

@@ -9,7 +9,7 @@ RUN pip install -r /app/codecollection/requirements.txt
 
 # Install packages
 RUN apt-get update && \
-    apt install -y git && \
+    apt install -y git default-mysql-client && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt
@@ -20,3 +20,5 @@ RUN chown 1000:0 -R /app/codecollection
 
 # Set the user to $USER
 USER python
+ENV USER=python
+RUN chmod -R u+x /app/codecollection
