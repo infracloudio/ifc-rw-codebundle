@@ -16,26 +16,31 @@ class Prometheus:
     """
     ROBOT_LIBRARY_SCOPE = "GLOBAL"
 
-    def _query(self, url, target_service: platform.Service=None, params=None, timeout=30):
+    def _query(self, url, target_service: platform.Service=None, optional_headers: platform.Secret=None, params=None, timeout=30):
         """
         API request method wrapped by other public query methods.
         """
         if target_service:
             # if a runwhen service is provided, pass an equivalent curl to it instead
+            # If optional_headers are provided
             rsp = self._query_with_service(
                 url=url,
                 params=params,
+                optional_headers=optional_headers,
                 target_service=target_service
-            )
+            )          
         else:
             # else we assume the prometheus instance is public
             headers = {
                 "content-type":"application/json",
             }
-            # if optional_headers:
-            #     optional_headers = json.loads(optional_headers.value)
-            #     headers.update(optional_headers)
-            rsp = requests.get(url, headers=headers, params=params, timeout=timeout)
+            if optional_headers:
+                optional_headers = json.loads(optional_headers.value)
+                headers.update(optional_headers)
+                rsp = requests.get(url, headers=headers, params=params, timeout=timeout)
+            else:
+                rsp = requests.get(url, params=params, timeout=timeout)
+                
             if rsp.status_code != 200:
                 raise ValueError(f"Received HTTP code {rsp.status_code} in response {rsp} against url {url} and params {params}")
             rsp = rsp.json()
@@ -45,18 +50,18 @@ class Prometheus:
             raise ValueError(f"API responded with error {rsp} against url {url} and params {params}")
         return rsp
 
-    # def _secret_to_curl_headers(self, optional_headers: platform.Secret) -> platform.Secret:
-    #     header_list = []
-    #     headers = {
-    #         "content-type":"application/json",
-    #     }
-    #     headers.update(json.loads(optional_headers.value))
-    #     for k,v in headers.items():
-    #         header_list.append(f"-H \"{k}: {v}\"")
-    #     optional_headers: platform.Secret = platform.Secret(key=optional_headers.key, val=" ".join(header_list))
-    #     return optional_headers
+    def _secret_to_curl_headers(self, optional_headers: platform.Secret) -> platform.Secret:
+        header_list = []
+        headers = {
+            "content-type":"application/json",
+        }
+        headers.update(json.loads(optional_headers.value))
+        for k,v in headers.items():
+            header_list.append(f"-H \"{k}: {v}\"")
+        optional_headers: platform.Secret = platform.Secret(key=optional_headers.key, val=" ".join(header_list))
+        return optional_headers
 
-    def _create_curl(self, url, params=None) -> str:
+    def _create_curl(self, url, optional_headers: platform.Secret=None, params=None) -> str:
         """
         Helper method to generate a curl string equivalent to a Requests object (roughly)
         Note that headers are inserted as a $variable to be substituted in the location service by an environment variable.
@@ -67,34 +72,41 @@ class Prometheus:
         else:
             params = ""
         # we use eval so that the location service evaluates the secret headers as multiple tokens
-        # curl = f"eval $(echo \"curl -X GET ${optional_headers.key} '{url}{params}'\")"
-        curl = f"eval $(echo \"curl -X GET '{url}{params}'\")"
+        if optional_headers:
+            curl = f"eval $(echo \"curl -X GET ${optional_headers.key} '{url}{params}'\")"
+        else:
+            curl = f"eval $(echo \"curl -X GET '{url}{params}'\")"
         return curl
 
     def _query_with_service(
         self, url: str,
         target_service: platform.Service,
+        optional_headers: platform.Secret=None,
         params=None,
     ) -> dict:
         """
         Passes a curl string over to a RunWhen location service which handles the request and returns the stdout.
         """
-        # optional_headers = self._secret_to_curl_header)
-        curl_str: str = self._create_curl(url, params=params)
+        curl_str: str = self._create_curl(url, optional_headers, params=params)
+        if optional_headers:
+            optional_headers = self._secret_to_curl_headers(optional_headers=optional_headers)
+            request_optional_headers = platform.ShellServiceRequestSecret(optional_headers)
+            rsp = platform.execute_shell_command(
+                cmd=curl_str,
+                service=target_service,
+                request_secrets=[request_optional_headers]
+            )
+        else:
+            rsp = platform.execute_shell_command(
+                cmd=curl_str,
+                service=target_service,
+            )
         
-        # request_optional_headers = platform.ShellServiceRequestSecret(optional_headers)
-        rsp = platform.execute_shell_command(
-            cmd=curl_str,
-            service=target_service
-        )
-        print(curl_str)
-        print(target_service)
         if rsp.status != 200:
             raise ValueError(f"Received HTTP status of {rsp.status} from response {rsp}")
         if rsp.returncode > 0:
             raise ValueError(f"Recieved return code of {rsp.returncode} from response {rsp}")
         rsp = json.loads(rsp.stdout)
-        print(rsp)
         return rsp
 
     def query_instant(
@@ -103,6 +115,7 @@ class Prometheus:
         query,
         step: str=None,
         target_service: platform.Service=None,
+        optional_headers: platform.Secret=None,
         point_in_time = None
     ):
         """
@@ -125,13 +138,14 @@ class Prometheus:
         }
         if step:
             params["step"] = step
-        return self._query(api_url, target_service=target_service, params=params)
+        return self._query(api_url, target_service=target_service, optional_headers=optional_headers, params=params)
 
     def query_range(
         self,
         api_url,
         query,
         target_service: platform.Service=None,
+        optional_headers: platform.Secret=None,
         step="30s",
         seconds_in_past=60,
         start=None,
@@ -166,9 +180,9 @@ class Prometheus:
             "end": f"{end}",
             "step": f"{step}",
         }
-        return self._query(api_url, target_service=target_service, params=params)
+        return self._query(api_url, target_service=target_service, optional_headers=optional_headers, params=params)
 
-    def list_labels(self, api_url, target_service: platform.Service=None):
+    def list_labels(self, api_url, target_service: platform.Service=None, optional_headers: platform.Secret=None):
         """
         Performs a query against the prometheus labels API that provides a list of all labels under the organization.
 
@@ -181,9 +195,9 @@ class Prometheus:
         """
         api_url = f"{api_url}/labels"
         params = {}
-        return self._query(api_url, target_service=target_service, params=params)
+        return self._query(api_url, target_service=target_service, optional_headers=optional_headers, params=params)
 
-    def query_label(self, api_url, label, target_service: platform.Service=None):
+    def query_label(self, api_url, label, target_service: platform.Service=None, optional_headers: platform.Secret=None):
         """
         Performs a query against the prometheus labels API that provides a list of all values under a label.
 
@@ -195,7 +209,7 @@ class Prometheus:
         |   prometheus_response: dict  |
         """
         api_url = f"{api_url}/label/{label}/values"
-        return self._query(api_url, target_service=target_service)
+        return self._query(api_url, target_service=target_service, optional_headers=optional_headers)
 
     def transform_data(
         self,
@@ -241,26 +255,24 @@ class Prometheus:
 
         if "value" in data["result"][metric_index]:
             metric_data = data["result"][metric_index]["value"]
+            if method == "Raw":
+                return metric_data[column_index]
         elif "values" in data["result"][metric_index]:
             metric_data = data["result"][metric_index]["values"]
-        if method == "Raw":
-            if "value" in data["result"][metric_index]:
-                return metric_data[column_index]
-            elif "values" in data["result"][metric_index]:
+            if method == "Raw":
                 return metric_data[first_data_point][column_index]
-
-        column = [float(row[column_index]) for row in metric_data]
-        if method == "Max":
-            return max(column)
-        elif method == "Average":
-            return sum(column) / len(column)
-        elif method == "Minimum":
-            return min(column)
-        elif method == "Sum":
-            return sum(column)
-        elif method == "First":
-            return column[0]
-        elif method == "Last":
-            return column[-1]
-        else:
-            raise ValueError(f"Invalid transform method {method} provided for aggregation on list")
+            column = [float(row[column_index]) for row in metric_data]
+            if method == "Max":
+                return max(column)
+            elif method == "Average":
+                return sum(column) / len(column)
+            elif method == "Minimum":
+                return min(column)
+            elif method == "Sum":
+                return sum(column)
+            elif method == "First":
+                return column[0]
+            elif method == "Last":
+                return column[-1]
+            else:
+                raise ValueError(f"Invalid transform method {method} provided for aggregation on list")
