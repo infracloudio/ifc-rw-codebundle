@@ -27,7 +27,7 @@ Run Bash File
 
 *** Keywords ***
 Suite Initialization
-   ${MYSQL_PASSWORD}=    RW.Core.Import Secret    MYSQL_PASSWORD
+   ${MYSQL_PASSWORD}=    RW.Core.Import User Variable    MYSQL_PASSWORD
     ...    type=string
     ...    description=MySQL password
     ...    pattern=\w*
@@ -41,7 +41,7 @@ Suite Initialization
     ...    type=string
     ...    description=MySQL host endpoint
     ...    pattern=\w*
-    ...    example=robotshopmysql.cn9m6m4s8zo0.us-west-2.rds.amazonaws.com
+    ...    example=robotshopmysql.example.us-west-2.rds.amazonaws.com
     ${PROCESS_USER}=    RW.Core.Import User Variable    PROCESS_USER
     ...    type=string
     ...    description=mysql user which created numbers of sleep connections
@@ -49,4 +49,4 @@ Suite Initialization
     ...    example=shipping
 
     Set Suite Variable
-    ...    ${env}    {"MYSQL_USER":"${MYSQL_USER}", "MYSQL_PASSWORD":"${MYSQL_PASSWORD_ENV}", "MYSQL_HOST":"${MYSQL_HOST}", "PROCESS_USER":"${PROCESS_USER}"}
+    ...    ${env}    {"MYSQL_USER":"${MYSQL_USER}", "MYSQL_PASSWORD":"${MYSQL_PASSWORD}", "MYSQL_HOST":"${MYSQL_HOST}", "PROCESS_USER":"${PROCESS_USER}"}
