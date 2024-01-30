@@ -5,8 +5,8 @@ locations:
 description: >-
   Watch RDS MySql connection count
 codeBundle:
-  repoUrl: https://github.com/infracloudio/infracloud-runwhen-codecollection.git
-  ref: codebundle-rds-mysql-conn
+  repoUrl: https://github.com/infracloudio/ifc-rw-codecollection
+  ref: main
   pathToRobot: codebundles/rds-mysql-conn-count/sli.robot
 # read more about intervalStrategy here: https://docs.runwhen.com/public/runwhen-platform/feature-overview/points-on-the-map-slxs/service-level-indicators-slis/interval-strategies
 intervalStrategy: intermezzo
