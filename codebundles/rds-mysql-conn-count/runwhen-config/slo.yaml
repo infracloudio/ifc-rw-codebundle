@@ -1,0 +1,8 @@
+codeBundle:
+  repoUrl: https://github.com/runwhen-contrib/rw-public-codecollection
+  pathToYaml: codebundles/slo-default/queries.yaml
+  ref: main
+sloSpecType: simple-mwmb
+objective: 95
+threshold: 48
+operand: lt

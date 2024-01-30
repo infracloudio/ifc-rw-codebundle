@@ -1,0 +1,9 @@
+statement: RDS MySql connections should be within 80% of total max connection.
+alias: RDS MySql Connections Count
+metricType: gauge
+asMeasuredBy: Score based on promethues query
+icon: Cloud
+owners:
+  - saurabh.yadav@infracloud.io
+imageURL: >-
+  https://storage.googleapis.com/runwhen-nonprod-shared-images/icons/kubernetes/resources/labeled/ns.svg

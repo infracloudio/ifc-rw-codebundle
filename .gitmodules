@@ -1,0 +1,4 @@
+[submodule "test/sre-stack"]
+	path = test/sre-stack
+	url = https://github.com/infracloudio/sre-stack.git
+	branch = main

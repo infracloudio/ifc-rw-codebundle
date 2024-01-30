@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rds-mysql-connection-count
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rds-mysql-connection-count
+  template:
+    metadata:
+      labels:
+        app: rds-mysql-connection-count
+    spec:
+      containers:
+      - name: rds-mysql-connection-count
+        image: 590183940259.dkr.ecr.us-west-2.amazonaws.com/runwhen:latest
+        command:
+          - "bash"
+          - "-c"
+          - "ro /app/codecollection/codebundles/rds-mysql-conn-count/runbook.robot && while true; do sleep 5; done"
+        ports:
+        - containerPort: 3000
+        env:
+        - name: ENV_PROMETHEUS_HOST
+          value: "http://ab916f39fadce498ead455d91e808053-1900228415.us-west-2.elb.amazonaws.com/prometheus/api/v1"
+        - name: ENV_QUERY
+          value: "aws_rds_database_connections_average{dimension_DBInstanceIdentifier=\"robotshopmysql\"} > 1"
+        - name: MYSQL_USER
+          value: "admin"
+        - name: MYSQL_PASSWORD_ENV
+          value: "docdb3421z"
+        - name: MYSQL_HOST
+          value: "robotshopmysql.c5eo4uy8mys1.us-west-2.rds.amazonaws.com"
+        - name: PROCESS_USER
+          value: "shipping"
+        - name: RW_PATH_TO_ROBOT
+          value: "/app/codecollection/codebundles/rds-mysql-conn-count/runbook.robot"
