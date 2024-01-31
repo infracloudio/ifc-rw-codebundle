@@ -6,9 +6,6 @@ Suite Setup       Suite Initialization
 Library           RW.Core
 Library           RW.Prometheus
 
-*** Variables ***
-${ENV_PROMETHEUS_HOST}      %{ENV_PROMETHEUS_HOST}
-${ENV_QUERY}      %{ENV_QUERY}
 
 *** Keywords ***
 Suite Initialization
@@ -74,8 +71,8 @@ Suite Initialization
 Querying Prometheus Instance And Pushing Aggregated Data
     Log      ${ENV_QUERY}
     ${rsp}=    RW.Prometheus.Query Instant
-    ...    api_url=${ENV_PROMETHEUS_HOST}
-    ...    query=${ENV_QUERY}
+    ...    api_url=${PROMETHEUS_HOSTNAME}
+    ...    query=${QUERY}
     ...    step=${STEP}
     ...    target_service=${CURL_SERVICE}
     ${data}=    Set Variable    ${rsp["data"]}
