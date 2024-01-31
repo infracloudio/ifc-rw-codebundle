@@ -15,12 +15,6 @@ Suite Initialization
     ...    pattern=\w*
     ...    example=curl-service.shared
     ...    default=curl-service.shared
-    ${OPTIONAL_HEADERS}=    RW.Core.Import Secret    OPTIONAL_HEADERS
-    ...    type=string
-    ...    description=A json string of headers to include in the request against the Prometheus instance. This can include your token.
-    ...    pattern=\w*
-    ...    default="{"my-header":"my-value"}"
-    ...    example='{"my-header":"my-value", "Authorization": "Bearer mytoken"}'
     RW.Core.Import User Variable    PROMETHEUS_HOSTNAME
     ...    type=string
     ...    description=The prometheus endpoint to perform requests against.
@@ -63,13 +57,11 @@ Suite Initialization
     ...    default=0
     ...    example=0
     Set Suite Variable    ${CURL_SERVICE}    ${CURL_SERVICE}
-    Set Suite Variable    ${OPTIONAL_HEADERS}    ${OPTIONAL_HEADERS}
     Set Suite Variable    ${NO_RESULT_OVERWRITE}    ${NO_RESULT_OVERWRITE}
     Set Suite Variable    ${NO_RESULT_VALUE}    ${NO_RESULT_VALUE}
 
 *** Tasks ***
 Querying Prometheus Instance And Pushing Aggregated Data
-    Log      ${ENV_QUERY}
     ${rsp}=    RW.Prometheus.Query Instant
     ...    api_url=${PROMETHEUS_HOSTNAME}
     ...    query=${QUERY}
