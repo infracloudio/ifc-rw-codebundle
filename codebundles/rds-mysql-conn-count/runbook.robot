@@ -9,8 +9,6 @@ Library             RW.CLI
 
 Suite Setup         Suite Initialization
 
-*** Variables ***
-${MYSQL_PASSWORD_ENV}      %{MYSQL_PASSWORD_ENV}
 
 *** Tasks ***
 Run Bash File
@@ -20,6 +18,7 @@ Run Bash File
     ...    bash_file=kill-mysql-sleep-processes.sh
     ...    cmd_override=./kill-mysql-sleep-processes.sh
     ...    env=${env}
+    ...    secret__mysql_password=${MYSQL_PASSWORD}
     ...    include_in_history=False
     RW.Core.Add Pre To Report    Command Stdout:\n${rsp.stdout}
     RW.Core.Add Pre To Report    Command Stderr:\n${rsp.stderr}
@@ -41,7 +40,7 @@ Suite Initialization
     ...    type=string
     ...    description=MySQL host endpoint
     ...    pattern=\w*
-    ...    example=robotshopmysql.cn9m6m4s8zo0.us-west-2.rds.amazonaws.com
+    ...    example=exampledb.example.us-west-2.rds.amazonaws.com
     ${PROCESS_USER}=    RW.Core.Import User Variable    PROCESS_USER
     ...    type=string
     ...    description=mysql user which created numbers of sleep connections
@@ -49,4 +48,4 @@ Suite Initialization
     ...    example=shipping
 
     Set Suite Variable
-    ...    ${env}    {"MYSQL_USER":"${MYSQL_USER}", "MYSQL_PASSWORD":"${MYSQL_PASSWORD_ENV}", "MYSQL_HOST":"${MYSQL_HOST}", "PROCESS_USER":"${PROCESS_USER}"}
+    ...    ${env}    {"MYSQL_USER":"${MYSQL_USER}", "MYSQL_HOST":"${MYSQL_HOST}", "PROCESS_USER":"${PROCESS_USER}"}
