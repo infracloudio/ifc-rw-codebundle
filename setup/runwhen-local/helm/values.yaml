@@ -106,8 +106,8 @@ discoveryKubeconfig:
 # also supports upload configuration for continuous updates of RunWhen Platform Workspace
 # upload is disabled by default; requires a valid uploadInfo.yaml
 autoRun:
-  discoveryInterval: 14400                 # seconds to wait until a new discovery
-  uploadEnabled: false                     # upload configuration to RunWhen Platform
+  discoveryInterval: 1800                 # seconds to wait until a new discovery
+  uploadEnabled: true                     # upload configuration to RunWhen Platform
   uploadMergeMode: "keep-uploaded"         # 'keep-uploaded' or 'keep-existing'
 
 
