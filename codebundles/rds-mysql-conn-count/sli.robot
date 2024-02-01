@@ -15,7 +15,7 @@ Suite Initialization
     ...    pattern=\w*
     ...    example=curl-service.shared
     ...    default=curl-service.shared
-    RW.Core.Import User Variable    PROMETHEUS_HOSTNAME
+    RW.Core.Import User Variable    PROMETHEUS_URL
     ...    type=string
     ...    description=The prometheus endpoint to perform requests against.
     ...    pattern=\w*
@@ -63,7 +63,7 @@ Suite Initialization
 *** Tasks ***
 Querying Prometheus Instance And Pushing Aggregated Data
     ${rsp}=    RW.Prometheus.Query Instant
-    ...    api_url=${PROMETHEUS_HOSTNAME}
+    ...    api_url=${PROMETHEUS_URL}
     ...    query=${QUERY}
     ...    step=${STEP}
     ...    target_service=${CURL_SERVICE}

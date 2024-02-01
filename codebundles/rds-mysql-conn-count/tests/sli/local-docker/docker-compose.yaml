@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  rw-sli-test:
+    build:
+      context: ../../../../../
+      dockerfile: Dockerfile
+    environment:
+      PROMETHEUS_URL: "http://localhost:9090/prometheus/api/v1"
+      QUERY: "aws_rds_database_connections_average{dimension_DBInstanceIdentifier=\"robotshopmysql\"} > 1"
+    ports: 
+      - 3000:3000
+networks:
+  host:
+    name: host
+    external: true 
