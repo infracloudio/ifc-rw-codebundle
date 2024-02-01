@@ -1,8 +1,8 @@
 GIT_TLD=$(shell git rev-parse --show-toplevel)
-include $(GIT_TLD)/test/sre-stack/.env
+include $(GIT_TLD)/dev-cluster/sre-stack/.env
 include $(GIT_TLD)/.env
-include $(GIT_TLD)/test/sre-stack/makefile
-SRE_STACK_DIR := $(GIT_TLD)/test/sre-stack
+include $(GIT_TLD)/dev-cluster/sre-stack/makefile
+SRE_STACK_DIR := $(GIT_TLD)/dev-cluster/sre-stack
 RUNWHEN_SETUP_SCRIPT_PATH=setup/runwhen-local/setup.sh
 
 RUNWHEN_REQUIRED_VARS := RUNWHEN_PLATFORM_TOKEN
