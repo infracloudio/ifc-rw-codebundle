@@ -24,8 +24,8 @@ Suite Initialization
     ...    type=string
     ...    description=The PromQL statement used to query metrics.
     ...    pattern=\w*
-    ...    example=sysdig_container_cpu_quota_used_percent > 75 or sysdig_container_memory_limit_used_percent> 75
-    ...    default=sysdig_container_cpu_quota_used_percent > 75 or sysdig_container_memory_limit_used_percent> 75
+    ...    example=aws_rds_database_connections_average{dimension_DBInstanceIdentifier="dbname"} > 1
+    ...    default=aws_rds_database_connections_average{dimension_DBInstanceIdentifier="dbname"} > 1
     RW.Core.Import User Variable    TRANSFORM
     ...    type=string
     ...    enum=[Raw,Max,Average,Minimum,Sum,First,Last]
