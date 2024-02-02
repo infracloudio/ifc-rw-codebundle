@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rds-mysql-connection-count-runbook-svc
+spec:
+  selector:
+    app: rds-mysql-connection-count-runbook
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
