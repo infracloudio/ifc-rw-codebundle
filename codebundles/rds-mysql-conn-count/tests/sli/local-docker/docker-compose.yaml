@@ -5,11 +5,6 @@ services:
       context: ../../../../../
       dockerfile: Dockerfile
     environment:
-      PROMETHEUS_URL: "http://localhost:9090/prometheus/api/v1"
+      PROMETHEUS_URL: "http://${PROM_HOST}/api/v1"
       QUERY: "aws_rds_database_connections_average{dimension_DBInstanceIdentifier=\"robotshopmysql\"} > 1"
-    ports: 
-      - 3000:3000
-networks:
-  host:
-    name: host
-    external: true 
+    network_mode: host
