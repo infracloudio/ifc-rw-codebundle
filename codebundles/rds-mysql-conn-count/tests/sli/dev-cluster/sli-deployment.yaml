@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rds-mysql-connection-count-sli
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rds-mysql-connection-count-sli
+  template:
+    metadata:
+      labels:
+        app: rds-mysql-connection-count-sli
+    spec:
+      containers:
+      - name: rds-mysql-connection-count-sli
+        image: 590183940259.dkr.ecr.us-west-2.amazonaws.com/runwhen:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: PROMETHEUS_URL
+          value: "http://ab916f39fadce498ead455d91e808053-1900228415.us-west-2.elb.amazonaws.com/prometheus/api/v1"
+        - name: QUERY
+          value: "aws_rds_database_connections_average{dimension_DBInstanceIdentifier=\"robotshopmysql\"} > 1"

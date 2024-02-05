@@ -6,9 +6,6 @@ Suite Setup       Suite Initialization
 Library           RW.Core
 Library           RW.Prometheus
 
-*** Variables ***
-${ENV_PROMETHEUS_HOST}      %{ENV_PROMETHEUS_HOST}
-${ENV_QUERY}      %{ENV_QUERY}
 
 *** Keywords ***
 Suite Initialization
@@ -18,13 +15,7 @@ Suite Initialization
     ...    pattern=\w*
     ...    example=curl-service.shared
     ...    default=curl-service.shared
-    ${OPTIONAL_HEADERS}=    RW.Core.Import Secret    OPTIONAL_HEADERS
-    ...    type=string
-    ...    description=A json string of headers to include in the request against the Prometheus instance. This can include your token.
-    ...    pattern=\w*
-    ...    default="{"my-header":"my-value"}"
-    ...    example='{"my-header":"my-value", "Authorization": "Bearer mytoken"}'
-    RW.Core.Import User Variable    PROMETHEUS_HOSTNAME
+    RW.Core.Import User Variable    PROMETHEUS_URL
     ...    type=string
     ...    description=The prometheus endpoint to perform requests against.
     ...    pattern=\w*
@@ -33,8 +24,8 @@ Suite Initialization
     ...    type=string
     ...    description=The PromQL statement used to query metrics.
     ...    pattern=\w*
-    ...    example=sysdig_container_cpu_quota_used_percent > 75 or sysdig_container_memory_limit_used_percent> 75
-    ...    default=sysdig_container_cpu_quota_used_percent > 75 or sysdig_container_memory_limit_used_percent> 75
+    ...    example=aws_rds_database_connections_average{dimension_DBInstanceIdentifier="dbname"} > 1
+    ...    default=aws_rds_database_connections_average{dimension_DBInstanceIdentifier="dbname"} > 1
     RW.Core.Import User Variable    TRANSFORM
     ...    type=string
     ...    enum=[Raw,Max,Average,Minimum,Sum,First,Last]
@@ -66,16 +57,14 @@ Suite Initialization
     ...    default=0
     ...    example=0
     Set Suite Variable    ${CURL_SERVICE}    ${CURL_SERVICE}
-    Set Suite Variable    ${OPTIONAL_HEADERS}    ${OPTIONAL_HEADERS}
     Set Suite Variable    ${NO_RESULT_OVERWRITE}    ${NO_RESULT_OVERWRITE}
     Set Suite Variable    ${NO_RESULT_VALUE}    ${NO_RESULT_VALUE}
 
 *** Tasks ***
 Querying Prometheus Instance And Pushing Aggregated Data
-    Log      ${ENV_QUERY}
     ${rsp}=    RW.Prometheus.Query Instant
-    ...    api_url=${ENV_PROMETHEUS_HOST}
-    ...    query=${ENV_QUERY}
+    ...    api_url=${PROMETHEUS_URL}
+    ...    query=${QUERY}
     ...    step=${STEP}
     ...    target_service=${CURL_SERVICE}
     ${data}=    Set Variable    ${rsp["data"]}

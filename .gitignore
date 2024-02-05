@@ -3,4 +3,4 @@ __pycache__
 output.xml
 log.html
 report.html
-test/sre-stack/*
+dev-cluster/sre-stack/*
