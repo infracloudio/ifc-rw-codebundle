@@ -1,6 +1,10 @@
 #!/bin/bash
 
-NS=codebundles
+# Prerequisites
+# 1) Please login to ecr using this command: aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <registry_url>
+# 2) Build and Push the image to ecr and update image in sli-deployment.yaml
+
+NS=runwhen
 
 kubectl create ns ${NS} --dry-run=client -o yaml | kubectl apply -f -
 
@@ -20,6 +24,8 @@ kubectl delete -f sli-deployment.yaml --ignore-not-found=true -n ${NS}
 # Deploy SLI test deployment
 kubectl apply -f sli-deployment.yaml -n ${NS}
 kubectl wait --for=condition=Ready pod -l app=rds-mysql-connection-count-sli --timeout 2m0s -n ${NS}
+
+kubectl exec deploy/rds-mysql-connection-count-sli -n ${NS} -- ro /app/codecollection/codebundles/rds-mysql-conn-count/sli.robot
 
 # Exposes SLI test deployment
 kubectl port-forward deploy/rds-mysql-connection-count-sli 3000:3000 -n ${NS} &

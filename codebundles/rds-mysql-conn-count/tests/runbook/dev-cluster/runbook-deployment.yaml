@@ -15,10 +15,6 @@ spec:
       containers:
       - name: rds-mysql-connection-count-runbook
         image: 590183940259.dkr.ecr.us-west-2.amazonaws.com/runwhen:latest
-        command:
-          - "bash"
-          - "-c"
-          - "ro /app/codecollection/codebundles/rds-mysql-conn-count/runbook.robot && ls -R /robot_logs && while true; do sleep 5; done"
         ports:
         - containerPort: 3000
         env:

@@ -4,7 +4,7 @@
 # 1) Please login to ecr using this command: aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <registry_url>
 # 2) Build and Push the image to ecr and update image in runbook-deployment.yaml
 
-NS=codebundles
+NS=runwhen
 
 kubectl create ns ${NS} --dry-run=client -o yaml | kubectl apply -f -
 
@@ -29,6 +29,8 @@ kubectl wait --for=condition=Ready pod -l app=create-mysql-sleep-connection -n $
 # Run runbook to kill the sleep connections
 kubectl apply -f ./runbook-deployment.yaml -n ${NS}
 kubectl wait --for=condition=Ready pod -l app=rds-mysql-connection-count-runbook --timeout 2m0s -n ${NS}
+
+kubectl exec deploy/rds-mysql-connection-count-runbook -n ${NS} -- ro /app/codecollection/codebundles/rds-mysql-conn-count/runbook.robot
 
 # port-forward rds-mysql-connection-count-runbook-svc
 kubectl port-forward deploy/rds-mysql-connection-count-runbook 3000:3000 -n ${NS} & 
