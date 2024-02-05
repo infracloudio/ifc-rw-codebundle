@@ -23,7 +23,7 @@ spec:
         - name: MYSQL_HOST
           value: "robotshopmysql.c5eo4uy8mys1.us-west-2.rds.amazonaws.com"
         - name: CONNECTIONS
-          value: "1"
+          value: "30"
         - name: SLEEP_TIMEOUT
           value: "260"
         command: ["/bin/bash", "-c"]
