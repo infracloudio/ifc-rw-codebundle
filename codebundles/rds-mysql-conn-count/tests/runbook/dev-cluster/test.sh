@@ -5,16 +5,18 @@
 # 2) Build and Push the image to ecr and update image in runbook-deployment.yaml
 
 NS=runwhen
+PF_PORT=3002
+RUNBOOK_NAME=rds-mysql-connection-count-runbook
 
 kubectl create ns ${NS} --dry-run=client -o yaml | kubectl apply -f -
 
 # Remove existing port-forward
-process_id=$(ps -ef | grep '[p]ort-forward' | awk '{print $2}')
+process_id=$(ps -ef | grep 'port-forward' | grep "${RUNBOOK_NAME}" | grep "${PF_PORT}" | awk '{print $2}')
 
 if [ -z "$process_id" ]; then
-    echo "No process found with the name 'port-forward'."
+    echo "No ${RUNBOOK_NAME} port-forward process found."
 else
-    echo "Killing process with PID: $process_id"
+    echo "Killing ${RUNBOOK_NAME} port-forward with PID: $process_id"
     kill -9 $process_id
 fi
 
@@ -28,15 +30,15 @@ kubectl wait --for=condition=Ready pod -l app=create-mysql-sleep-connection -n $
 
 # Run runbook to kill the sleep connections
 kubectl apply -f ./runbook-deployment.yaml -n ${NS}
-kubectl wait --for=condition=Ready pod -l app=rds-mysql-connection-count-runbook --timeout 2m0s -n ${NS}
+kubectl wait --for=condition=Ready pod -l app=${RUNBOOK_NAME} --timeout 2m0s -n ${NS}
 
-kubectl exec deploy/rds-mysql-connection-count-runbook -n ${NS} -- ro /app/codecollection/codebundles/rds-mysql-conn-count/runbook.robot
+kubectl exec deploy/${RUNBOOK_NAME} -n ${NS} -- ro /app/codecollection/codebundles/rds-mysql-conn-count/runbook.robot
 
-# port-forward rds-mysql-connection-count-runbook-svc
-kubectl port-forward deploy/rds-mysql-connection-count-runbook 3000:3000 -n ${NS} & 
+# Exposes runbook test deployment
+kubectl port-forward deploy/${RUNBOOK_NAME} ${PF_PORT}:3000 -n ${NS} & 
 
 ## Show browser URLs
-printf "\n Open Status page http://localhost:3000/"
-printf "\n See logs http://localhost:3000/rds-mysql-conn-count/runbook-log.html"
+printf "\n Open Status page http://localhost:${PF_PORT}/"
+printf "\n See logs http://localhost:${PF_PORT}/rds-mysql-conn-count/runbook-log.html\n"
 
 
