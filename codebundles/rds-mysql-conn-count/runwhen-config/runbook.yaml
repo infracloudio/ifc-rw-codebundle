@@ -3,7 +3,6 @@ codeBundle:
   repoUrl: https://github.com/infracloudio/ifc-rw-codecollection
   ref: main
   pathToRobot: codebundles/rds-mysql-conn-count/runbook.robot
-secretsProvided: []
 servicesProvided:
   - name: curl
     locationServiceName: curl-service.shared
@@ -14,5 +13,3 @@ configProvided:
     value: robotshopmysql.example.us-west-2.rds.amazonaws.com
   - name: PROCESS_USER
     value: shipping
-  - name: MYSQL_PASSWORD
-    value: example_pass
