@@ -1,0 +1,3 @@
+# Please update the RDS_MYSQL_DB_NAME to match your RDS instance name, for which we aim to establish the SLO based on aws_rds_database_connections_average metric
+errorQuery: "aws_rds_database_connections_average{dimension_DBInstanceIdentifier="robotshopmysql"} > 30"
+totalQuery: "aws_rds_database_connections_average{dimension_DBInstanceIdentifier="robotshopmysql"}"
