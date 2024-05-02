@@ -1,8 +1,8 @@
 codeBundle:
   repoUrl: https://github.com/infracloudio/ifc-rw-codecollection
-  pathToYaml: codebundles/slo-default/queries.yaml
+  pathToYaml: codebundles/rds-mysql-conn-count/slo-queries.yaml
   ref: main
 sloSpecType: simple-mwmb
 objective: 95
-threshold: 48
+threshold: 30
 operand: lt

@@ -17,7 +17,7 @@ configProvided:
       http://aeccfb7ff9bfb4705b6218294a7346c3-2081802229.us-west-2.elb.amazonaws.com/prometheus/api/v1
   - name: QUERY
     value: >-
-      aws_rds_database_connections_average{dimension_DBInstanceIdentifier="robotshopmysql"} > 1
+      aws_rds_database_connections_average{dimension_DBInstanceIdentifier="robotshopmysql"} > 30
   - name: TRANSFORM
     value: RAW
   - name: STEP
