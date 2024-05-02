@@ -1,5 +1,5 @@
 codeBundle:
-  repoUrl: https://github.com/runwhen-contrib/rw-public-codecollection
+  repoUrl: https://github.com/infracloudio/ifc-rw-codecollection
   pathToYaml: codebundles/slo-default/queries.yaml
   ref: main
 sloSpecType: simple-mwmb
